@@ -8,14 +8,21 @@ Created on Fri Mar 26 20:07:00 2021
 
 import pandas as pd
 
-def read_data(filename):
+def clean_data(filename):
+    ''' Read and filter data to data points that we are going to utilize
+    throughout the project '''
     data = pd.read_csv(filename)
-    return data
+    
+    # Remove all players not drafted in first two rounds (top 60 picks)
+    first_two_rounds = data[data['Pk'] <= 60]
+
+    return first_two_rounds
 
 
 def main():
-    data = read_data('draft_data.csv')
-    print(data.head())
+    data = clean_data('draft_data.csv')
+    print(data)
     
 main()
+    
     
