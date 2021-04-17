@@ -77,12 +77,12 @@ def nba_team_analysis(data):
 
     plt.show()
 def main():
-    data = clean_data('draft_data.csv')
-    recent = data[data['Draft_Yr'] >= 2000]
-c              dedcezxcftvc vn    pick = pick_number_analysis(data)
-    pick = pick_number_analysis(recent)
-    college = college_attended_analysis(data)
-    team = nba_team_analysis(data)
-   # print(data['allstar'])
+    #data = clean_data('draft_data.csv')
+    #recent = data[data['Draft_Yr'] >= 2000]
+    #pick = pick_number_analysis(data)
+    #pick = pick_number_analysis(recent)
+    #college = college_attended_analysis(data)
+    #team = nba_team_analysis(data)
+    #print(data['allstar'])
 main()
     
