@@ -77,6 +77,15 @@ def nba_team_analysis(data):
     plt.grid(axis = 'y')
 
     plt.show()
+    
+def get_points(data):
+    recent = data[data['Draft_Yr'] >= 2000]
+    grouped_data = recent.groupby(['Pk']).mean()
+    print(grouped_data['PTS'].head())
+    print(grouped_data['Points.per.Game'].head())
+    
+    
+    
 def main():
     #data = clean_data('draft_data.csv')
     #recent = data[data['Draft_Yr'] >= 2000]
@@ -85,5 +94,6 @@ def main():
     #college = college_attended_analysis(data)
     #team = nba_team_analysis(data)
     #print(data['allstar'])
+    get_points(data)
 main()
     
