@@ -26,7 +26,7 @@ def clean_data(filename):
     
     # Remove all players not drafted in first two rounds (top 60 picks)
     first_round = data[(data['Pk'] <= 30) & (data['Yrs'] > 1)]
-    first_round = first_round.iloc[:, :-12]
+    first_round = first_round.iloc[:, :-10]
     
     # Add Columns
     first_round['allstar'] = first_round['All.Star'] > 0
