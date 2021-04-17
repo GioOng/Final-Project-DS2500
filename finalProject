@@ -78,11 +78,11 @@ def nba_team_analysis(data):
 
     plt.show()
     
-def get_points(data):
+def get_points(data, column_name):
     recent = data[data['Draft_Yr'] >= 2000]
     grouped_data = recent.groupby(['Pk']).mean()
-    print(grouped_data['PTS'].head())
-    print(grouped_data['Points.per.Game'].head())
+    averaged_data = grouped_data[column_name]
+    return averaged_data
     
     
     
@@ -94,6 +94,6 @@ def main():
     #college = college_attended_analysis(data)
     #team = nba_team_analysis(data)
     #print(data['allstar'])
-    get_points(data)
+    get_points(data. 'PTS')
 main()
     
