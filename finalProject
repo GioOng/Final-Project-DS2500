@@ -32,6 +32,23 @@ def clean_data(filename):
     first_round['allstar'] = first_round['All.Star'] > 0
     return first_round
 
+def clean_allstars(filename):
+    allstars = []
+    with open(filename, errors='ignore') as file:
+        # reading a csv file
+        reader = csv.reader(file, delimiter=',')
+        
+        for row in reader:
+            if row[0] != 'PG':
+                allstars.append(row[0])
+                allstars.append(row[1])
+                allstars.append(row[2])
+                allstars.append(row[3])
+                allstars.append(row[4])
+    while("" in allstars) :
+        allstars.remove("")
+    print(allstars)
+
 def pick_number_analysis(data):
     grouped_data = data.groupby(['Pk']).sum()   
     x = grouped_data.index
@@ -94,6 +111,8 @@ def main():
     #college = college_attended_analysis(data)
     #team = nba_team_analysis(data)
     #print(data['allstar'])
-    get_points(data. 'PTS')
+    get_points(data, 'PTS')
+    all_stars = clean_allstars('ALLSTARS.CSV')
+    
 main()
     
