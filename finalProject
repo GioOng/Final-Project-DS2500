@@ -18,6 +18,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 import numpy as np
+import csv
 
 def clean_data(filename):
     ''' Read and filter data to data points that we are going to utilize
@@ -25,14 +26,15 @@ def clean_data(filename):
     data = pd.read_csv(filename)
     
     # Remove all players not drafted in first two rounds (top 60 picks)
-    first_round = data[(data['Pk'] <= 30) & (data['Yrs'] > 1)]
+    first_round = data[(data['Pk'] <= 30)]
     first_round = first_round.iloc[:, :-10]
     
-    # Add Columns
-    first_round['allstar'] = first_round['All.Star'] > 0
+    
     return first_round
-
+        
+        
 def clean_allstars(filename):
+    
     allstars = []
     with open(filename, errors='ignore') as file:
         # reading a csv file
@@ -45,10 +47,14 @@ def clean_allstars(filename):
                 allstars.append(row[2])
                 allstars.append(row[3])
                 allstars.append(row[4])
+    
     while("" in allstars) :
         allstars.remove("")
-    print(allstars)
+        
+        
+    return allstars
 
+    
 def pick_number_analysis(data):
     grouped_data = data.groupby(['Pk']).sum()   
     x = grouped_data.index
@@ -102,17 +108,25 @@ def get_points(data, column_name):
     return averaged_data
     
     
-    
 def main():
-    #data = clean_data('draft_data.csv')
-    #recent = data[data['Draft_Yr'] >= 2000]
-    #pick = pick_number_analysis(data)
-    #pick = pick_number_analysis(recent)
-    #college = college_attended_analysis(data)
-    #team = nba_team_analysis(data)
-    #print(data['allstar'])
-    get_points(data, 'PTS')
+    data = clean_data('draft_data.csv')
+
+    recent = data[data['Draft_Yr'] >= 2000]
     all_stars = clean_allstars('ALLSTARS.CSV')
+    
+    recent['allstar'] = False
+    for index, row in recent.iterrows():
+        if row[1] in all_stars:
+            recent.loc[index,'allstar'] = True
+    
+    print(recent[recent['Player'].str.contains('Victor Oladipo')])
+    
+    # pick = pick_number_analysis(data)
+    # pick = pick_number_analysis(recent)
+    # college = college_attended_analysis(data)
+    # team = nba_team_analysis(data)
+    # print(data['allstar'])
+    get_points(data, 'PTS')
     
 main()
     
