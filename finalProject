@@ -81,6 +81,11 @@ def college_attended_analysis(data):
 
     plt.show()
     
+def longevity_analysis(data):
+    ax = sns.relplot(x = 'Pk', y ='Yrs', size = 'All.Star', hue = 'VORP',
+                     data = data, palette = 'seismic')
+    ax.set(title = 'Comparing Longevity of a Player with Draft Pick Number',
+           xlabel = 'Draft Pick Number', ylabel = 'Years Played' )    
     
 def nba_team_analysis(data):
     grouped_data = data.groupby(['Team']).sum()
