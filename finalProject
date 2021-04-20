@@ -15,20 +15,18 @@ from collections import *
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn import metrics
 
-
 def clean_data(filename):
     ''' Read and filter data to data points that we are going to utilize
     throughout the project '''
     data = pd.read_csv(filename, index_col = 'Player')
     
     # Remove all players not drafted in first two rounds (top 60 picks)
-    first_round = data[(data['Pk'] <= 30)]
-    first_round = first_round.iloc[:, :-10]
-    
-    recent = first_round[first_round['Draft_Yr'] >= 2000]
-    recent = recent.drop(recent.columns[0], axis=1)
-    
-    return recent
+    filtered = data[(data['Pk'] <= 30)]
+    filtered = filtered.iloc[:, :-10]
+    filtered = filtered.drop(filtered.columns[0], axis=1)
+
+   
+    return filtered
         
         
 def clean_allstars(filename):
@@ -84,6 +82,17 @@ def college_attended_analysis(data):
 
     plt.show()
     
+def high_school_analysis(data):
+    ax = sns.relplot(x = 'Pk', y = 'Yrs', hue = 'highschool', size = 'VORP', 
+                data = data, palette = 'BrBG', sizes = (10,300))
+    ax.set(title = 'Analyzing Players Drafted Out of High School',
+           xlabel = 'Draft Pick Number', ylabel = 'Years Played')
+    
+def longevity_analysis(data):
+    ax = sns.relplot(x = 'Pk', y ='Yrs', size = 'VORP', hue = 'All.Star',
+                     data = data, palette = 'RdYlGn', sizes = (10,300))
+    ax.set(title = 'Comparing Longevity of a Player with Draft Pick Number',
+           xlabel = 'Draft Pick Number', ylabel = 'Years Played' )    
     
 def nba_team_analysis(data):
     grouped_data = data.groupby(['Team']).sum()
@@ -99,6 +108,11 @@ def nba_team_analysis(data):
     plt.grid(axis = 'y')
 
     plt.show()
+    
+def successful_organization_analysis(data):
+    ax = sns.relplot(x = 'Pk', y = 'Yrs', hue = 'Team', data = data)
+    ax.set(title = 'Comparing Organizations That Produced 3 All-Stars or More',
+           xlabel = 'Draft Pick Number', ylabel = 'Years Played' )
     
 # def get_points(data, column_name):
 #     grouped_data = data.groupby(['Pk']).mean()
@@ -146,17 +160,41 @@ class KNN:
 def main():
     
     # read and clean the data sets
-    recent = clean_data('draft_data.csv')
+    
+    data = clean_data('draft_data.csv')
     all_stars = clean_allstars('ALLSTARS.CSV')
+    
+    # add allstars as a column based of all_stars.csv
+    data['allstar'] = False
+    for index, row in data.iterrows():
+        if index in all_stars:
+            data.loc[index,'allstar'] = True
+    
+    # add high school as a column based off of a list of high school players 
+    highschool =  ['Kevin Garnett', 'Kobe Bryant', 'Gerald Green' 
+                  "Jermaine O'Neal", 'J.R. Smith','Tracy McGrady', 
+                  'Al Harrington', 'Jonathan Bender', 'Leon Smith',
+                  'Darius Miles', 'DeShawn Stevenson', 'Kwame Brown',
+                  'Tyson Chandler', 'Eddy Curry', 'DeSagana Diop', 
+                  "Amar'e Stoudemire", 'LeBron James', 'Travis Outlaw',
+                  'Ndudi Ebi','Kendrick Perkins', 'Dwight Howard',
+                  'Shaun Livingston','Robert Swift', 'Sebastian Telfair',
+                  'Al Jefferson', 'Josh Smith', 'Dorell Wright', 
+                  'Martell Webster','Andrew Bynum']
+    
+    data['highschool'] = False
+    for index, row in data.iterrows():
+        if index in highschool:
+            data.loc[index,'highschool'] = True
+    
+    hs = data[data['highschool'] == True]
+    
+    recent = data[data['Draft_Yr'] >= 2000]
     combine_data = pd.read_csv('combine_stats.csv', index_col = 'Player')
     combine_data = combine_data.drop(combine_data.columns[0:3], axis=1)
     combine_data = combine_data.dropna()
     
-    # add allstars as a column based of all_stars.csv
-    recent['allstar'] = False
-    for index, row in recent.iterrows():
-        if index in all_stars:
-            recent.loc[index,'allstar'] = True
+    
     
     #Visualize initial data
     # pick = pick_number_analysis(recent)
@@ -165,6 +203,10 @@ def main():
     # print(recent['allstar'])
     #get_points(recent, 'PTS')
     
+    
+    sig_teams = recent[recent['Team'].isin(['CHI', 'DEN', 'IND', 'LAC', 'NOH', 'OKC', 'PHI', 'PHO', 'TOR'])]
+    sig_players = sig_teams[sig_teams['allstar'] == True]
+    successful_organization_analysis(sig_players)
     
     
     
