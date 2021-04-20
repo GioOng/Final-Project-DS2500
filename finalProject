@@ -205,12 +205,13 @@ def main():
     pick_number_analysis(recent)
     college_attended_analysis(recent)
     nba_team_analysis(recent)
-    high_school_analysis(data)
+    
 
     #%%% VISUALIZING INDEPTH OBSERVATIONS
     sig_teams = recent[recent['Team'].isin(['CHI', 'DEN', 'IND', 'LAC', 'NOH', 'OKC', 'PHI', 'PHO', 'TOR'])]
     sig_players = sig_teams[sig_teams['allstar'] == True]
     successful_organization_analysis(sig_players)
+    high_school_analysis(data)
     
 
     
@@ -247,7 +248,8 @@ def main():
     results = pd.DataFrame()
     results['y_test'] = y_test
     results['predictions'] = predictions
-    results['x'] = results.index + 1
+    
+    
     
     # evaluate and quantify the results
     print(metrics.max_error(y_test, predictions))
@@ -256,15 +258,17 @@ def main():
     
     
     # Visualize the results
-    fig, ax = plt.subplots() 
+    fig, ax = plt.subplots()
+    results['x'] = results.index + 1
     # Plot the first x and y axes:
-    results.plot.scatter(x = 'x', y = 'y_test', ax = ax) 
+    results.plot.scatter(x = 'x', y = 'y_test', ax = ax, color='green') 
     # Plot the second x and y axes 
-    results.plot.scatter(x = 'x', y = 'predictions', ax = ax, secondary_y = True, color = 'r') 
+    results.plot.scatter(x = 'x', y = 'predictions', ax = ax, secondary_y = True, color = 'orange') 
     ax.set_xlabel('Test Variables')
     ax.set_ylabel('VORP')
     ax.set_title('Comparing Actual and Predictions')
     ax.grid(True)
+    
 
     
         
