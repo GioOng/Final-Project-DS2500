@@ -11,9 +11,8 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import numpy as np
 import csv
-from collections import *
-from sklearn.neighbors import KNeighborsClassifier
 from sklearn import metrics
+
 
 def clean_data(filename):
     ''' Read and filter data to data points that we are going to utilize
@@ -119,11 +118,6 @@ def successful_organization_analysis(data):
     ax.set(title = 'Comparing Organizations That Produced 3 All-Stars or More',
            xlabel = 'Draft Pick Number', ylabel = 'Years Played' )
     
-# def get_points(data, column_name):
-#     grouped_data = data.groupby(['Pk']).mean()
-#     averaged_data = grouped_data[column_name]
-#     return averaged_data
-
 def eucl_dist(x1,x2):
     diff_x = x1 - x2
     total = np.sum(diff_x **2)
@@ -157,17 +151,25 @@ class KNN:
         
         #most_common = Counter(k_nearest_labels).most_common(1)
         avg_score = np.array(k_nearest_labels).mean()
-        print(avg_score)
         
         return round(avg_score,1)
     
     
 def main():
     
-    # read and clean the data sets
-    
+    #%%% READ AND CLEAN THE DATA SETS
+    # Draft Data Set
     data = clean_data('draft_data.csv')
+    
+    
+    # Combine Data Set
+    combine_data = pd.read_csv('combine_stats.csv', index_col = 'Player')
+    combine_data = combine_data.drop(combine_data.columns[0:3], axis=1)
+    combine_data = combine_data.dropna()
+    
+    # Allstar Data Set
     all_stars = clean_allstars('ALLSTARS.CSV')
+    
     
     # add allstars as a column based of all_stars.csv
     data['allstar'] = False
@@ -186,7 +188,6 @@ def main():
                   'Shaun Livingston','Robert Swift', 'Sebastian Telfair',
                   'Al Jefferson', 'Josh Smith', 'Dorell Wright', 
                   'Martell Webster','Andrew Bynum']
-    
     data['highschool'] = False
     for index, row in data.iterrows():
         if index in highschool:
@@ -194,33 +195,31 @@ def main():
     
     hs = data[data['highschool'] == True]
     
+    # filter the Draft Data Set to only those drafted after 2000s
     recent = data[data['Draft_Yr'] >= 2000]
-    combine_data = pd.read_csv('combine_stats.csv', index_col = 'Player')
-    combine_data = combine_data.drop(combine_data.columns[0:3], axis=1)
-    combine_data = combine_data.dropna()
     
     
     
-    #Visualize initial data
-    # pick = pick_number_analysis(recent)
-    # college = college_attended_analysis(recent)
-    # team = nba_team_analysis(recent)
-    # print(recent['allstar'])
-    #get_points(recent, 'PTS')
+    
+    #%%% VISUALIZING THE INITIAL OBSERVATIONS
+    pick_number_analysis(recent)
+    college_attended_analysis(recent)
+    nba_team_analysis(recent)
     high_school_analysis(data)
 
-    
+    #%%% VISUALIZING INDEPTH OBSERVATIONS
     sig_teams = recent[recent['Team'].isin(['CHI', 'DEN', 'IND', 'LAC', 'NOH', 'OKC', 'PHI', 'PHO', 'TOR'])]
     sig_players = sig_teams[sig_teams['allstar'] == True]
     successful_organization_analysis(sig_players)
     
+
     
     
-    
+    #%% MACHINE LEARNING PREDICTIONS (USING KNN)
     # merge data sets together
     full_data = recent.join(combine_data,how='inner')
-    # print(full_data.loc['Rudy Gobert']) 
-    
+ 
+    # create test and train data
     train = full_data.sample(frac = 0.5)
     test = full_data.drop(train.index)
     
@@ -238,20 +237,36 @@ def main():
     
     
     
-    
-    results = {}
+    # predict the VORP of a player 
     k = 3
-
     clf = KNN(K=k)
     clf.fit(X_train, y_train)
     predictions = clf.predict(x_test)
-    checking = pd.DataFrame()
-    checking['y_test'] = y_test
-    checking['predictions'] = predictions
+    
+    # store the results of the predictions
+    results = pd.DataFrame()
+    results['y_test'] = y_test
+    results['predictions'] = predictions
+    results['x'] = results.index + 1
+    
+    # evaluate and quantify the results
+    print(metrics.max_error(y_test, predictions))
+    print(metrics.mean_absolute_error(y_test, predictions))
+    print(results)
+    
+    
+    # Visualize the results
+    fig, ax = plt.subplots() 
+    # Plot the first x and y axes:
+    results.plot.scatter(x = 'x', y = 'y_test', ax = ax) 
+    # Plot the second x and y axes 
+    results.plot.scatter(x = 'x', y = 'predictions', ax = ax, secondary_y = True, color = 'r') 
+    ax.set_xlabel('Test Variables')
+    ax.set_ylabel('VORP')
+    ax.set_title('Comparing Actual and Predictions')
+    ax.grid(True)
 
-    print(checking)
     
-    
-    
+        
 main()
     
