@@ -246,7 +246,7 @@ def main():
     
     # store the results of the predictions
     results = pd.DataFrame()
-    results['y_test'] = y_test
+    results['Actual'] = y_test
     results['predictions'] = predictions
     
     
@@ -261,15 +261,14 @@ def main():
     fig, ax = plt.subplots()
     results['x'] = results.index + 1
     # Plot the first x and y axes:
-    results.plot.scatter(x = 'x', y = 'y_test', ax = ax, color='green') 
+    actual = results.plot.scatter(x = 'x', y = 'Actual', ax = ax, color='green', legend=True, label='Actual', marker='*') 
     # Plot the second x and y axes 
-    results.plot.scatter(x = 'x', y = 'predictions', ax = ax, secondary_y = True, color = 'orange') 
+    pred = results.plot.scatter(x = 'x', y = 'predictions', ax = ax, secondary_y = True, color = 'orange', legend=True, label = 'Predictions', marker='o') 
     ax.set_xlabel('Test Variables')
     ax.set_ylabel('VORP')
     ax.set_title('Comparing Actual and Predictions')
     ax.grid(True)
-    
-
+    fig.legend([actual, pred],['Green','Orange'])
     
         
 main()
