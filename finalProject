@@ -82,11 +82,10 @@ def college_attended_analysis(data):
 
     plt.show()
     
-def high_school_analysis(data):
-    ax = sns.relplot(x = 'Pk', y = 'Yrs', hue = 'highschool', size = 'VORP', 
-                data = data, palette = 'BrBG', sizes = (10,300))
-    ax.set(title = 'Analyzing Players Drafted Out of High School',
-           xlabel = 'Draft Pick Number', ylabel = 'Years Played')
+def successful_organization_analysis(data):
+    ax = sns.relplot(x = 'Pk', y = 'VORP', hue = 'Team', data = data)
+    ax.set(title = 'Comparing Organizations That Produced 3 All-Stars or More',
+           xlabel = 'Draft Pick Number', ylabel = 'Value Over Replacement Player' )
     
 def longevity_analysis(data):
     ax = sns.relplot(x = 'Pk', y ='Yrs', size = 'VORP', hue = 'All.Star',
