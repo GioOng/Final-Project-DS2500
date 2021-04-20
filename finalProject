@@ -100,6 +100,13 @@ def nba_team_analysis(data):
     plt.grid(axis = 'y')
 
     plt.show()
+
+def longevity_analysis(data):
+    ax = sns.relplot(x = 'Pk', y ='Yrs', size = 'All.Star', hue = 'VORP',
+                     data = data, palette = 'seismic')
+    ax.set(title = 'Comparing Longevity of a Player with Draft Pick Number',
+           xlabel = 'Draft Pick Number', ylabel = 'Years Played' )
+    
     
 def get_points(data, column_name):
     recent = data[data['Draft_Yr'] >= 2000]
@@ -127,6 +134,7 @@ def main():
     # team = nba_team_analysis(data)
     # print(data['allstar'])
     get_points(data, 'PTS')
-    
+    longevity_analysis(data)
+
 main()
     
