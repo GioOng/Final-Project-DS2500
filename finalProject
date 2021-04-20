@@ -12,6 +12,9 @@ import seaborn as sns
 import numpy as np
 import csv
 from collections import *
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn import metrics
+
 
 def clean_data(filename):
     ''' Read and filter data to data points that we are going to utilize
@@ -81,11 +84,6 @@ def college_attended_analysis(data):
 
     plt.show()
     
-def longevity_analysis(data):
-    ax = sns.relplot(x = 'Pk', y ='Yrs', size = 'All.Star', hue = 'VORP',
-                     data = data, palette = 'seismic')
-    ax.set(title = 'Comparing Longevity of a Player with Draft Pick Number',
-           xlabel = 'Draft Pick Number', ylabel = 'Years Played' )    
     
 def nba_team_analysis(data):
     grouped_data = data.groupby(['Team']).sum()
@@ -133,11 +131,16 @@ class KNN:
         eucl_distances = [eucl_dist(x, x_train) for x_train in self.X_train]
         
         k_nearest_points = np.argsort(eucl_distances)[:self.k]
+
+        
         k_nearest_labels = [self.y_train[i] for i in k_nearest_points]
+
         
-        most_common = Counter(k_nearest_labels).most_common(1)
+        #most_common = Counter(k_nearest_labels).most_common(1)
+        avg_score = np.array(k_nearest_labels).mean()
+        print(avg_score)
         
-        return most_common[0][0]
+        return round(avg_score,1)
     
     
 def main():
@@ -162,47 +165,42 @@ def main():
     # print(recent['allstar'])
     #get_points(recent, 'PTS')
     
-    # get test variables out
-    test_variables = recent[recent['Games'] <= 0]
-    recent = recent.drop(test_variables.index)
-
+    
+    
     
     # merge data sets together
     full_data = recent.join(combine_data,how='inner')
-    print(full_data.loc['Rudy Gobert'])
+    # print(full_data.loc['Rudy Gobert']) 
     
-    # get the Train labels and values
-    X_train = np.array(full_data.VORP)
-    y_train = np.array(full_data.iloc[:,-14:])
-    print(X_train.shape)
-    print(y_train.shape)
+    train = full_data.sample(frac = 0.5)
+    test = full_data.drop(train.index)
     
     # get the Test labels and values
-    x_test = np.array(test_variables.VORP)
-    y_test = np.array(test_variables.iloc[:,-14:])
+    x_test = np.array(test.iloc[:,-14:])
+    y_test = np.array(test.VORP) 
     print(x_test.shape)
     print(y_test.shape)
     
+    # get the Train labels and values
+    X_train = np.array(train.iloc[:,-14:])
+    y_train = np.array(train.VORP) 
+    print(X_train.shape)
+    print(y_train.shape)
+    
+    
+    
+    
     results = {}
-    k = 1
+    k = 3
 
     clf = KNN(K=k)
     clf.fit(X_train, y_train)
     predictions = clf.predict(x_test)
+    checking = pd.DataFrame()
+    checking['y_test'] = y_test
+    checking['predictions'] = predictions
 
-        
-    # Print the precision and recall, among other metrics    
-    report = metrics.classification_report(y_test, predictions, digits = 3)   
-    f1 = metrics.f1_score(y_test, predictions)
-    print(report)
-    results[k] = f1
-
-
-        
-    plt.plot(results.keys(),results.values())
-
-    
-    
+    print(checking)
     
     
     
