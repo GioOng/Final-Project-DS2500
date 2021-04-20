@@ -87,6 +87,12 @@ def successful_organization_analysis(data):
     ax.set(title = 'Comparing Organizations That Produced 3 All-Stars or More',
            xlabel = 'Draft Pick Number', ylabel = 'Value Over Replacement Player' )
     
+def high_school_analysis(data):
+    ax = sns.relplot(x = 'Pk', y = 'Yrs', hue = 'highschool', size = 'All.Star', 
+                data = data, cmap = 'set1', sizes = (10,300))
+    ax.set(title = 'Analyzing Players Drafted Out of High School',
+           xlabel = 'Draft Pick Number', ylabel = 'Years Played')
+    
 def longevity_analysis(data):
     ax = sns.relplot(x = 'Pk', y ='Yrs', size = 'VORP', hue = 'All.Star',
                      data = data, palette = 'RdYlGn', sizes = (10,300))
@@ -201,11 +207,13 @@ def main():
     # team = nba_team_analysis(recent)
     # print(recent['allstar'])
     #get_points(recent, 'PTS')
-    
+    high_school_analysis(data)
+
     
     sig_teams = recent[recent['Team'].isin(['CHI', 'DEN', 'IND', 'LAC', 'NOH', 'OKC', 'PHI', 'PHO', 'TOR'])]
     sig_players = sig_teams[sig_teams['allstar'] == True]
     successful_organization_analysis(sig_players)
+    
     
     
     
