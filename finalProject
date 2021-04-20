@@ -1,14 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Created on Sun Apr  4 21:08:18 2021
-
-@author: justinwoo
-"""
-
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-"""
 Created on Fri Mar 26 20:07:00 2021
 
 @author: gioong
@@ -19,18 +11,21 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import numpy as np
 import csv
+from collections import *
 
 def clean_data(filename):
     ''' Read and filter data to data points that we are going to utilize
     throughout the project '''
-    data = pd.read_csv(filename)
+    data = pd.read_csv(filename, index_col = 'Player')
     
     # Remove all players not drafted in first two rounds (top 60 picks)
     first_round = data[(data['Pk'] <= 30)]
     first_round = first_round.iloc[:, :-10]
     
+    recent = first_round[first_round['Draft_Yr'] >= 2000]
+    recent = recent.drop(recent.columns[0], axis=1)
     
-    return first_round
+    return recent
         
         
 def clean_allstars(filename):
@@ -54,6 +49,7 @@ def clean_allstars(filename):
         
     return allstars
 
+    
     
 def pick_number_analysis(data):
     grouped_data = data.groupby(['Pk']).sum()   
@@ -100,41 +96,110 @@ def nba_team_analysis(data):
     plt.grid(axis = 'y')
 
     plt.show()
+    
+# def get_points(data, column_name):
+#     grouped_data = data.groupby(['Pk']).mean()
+#     averaged_data = grouped_data[column_name]
+#     return averaged_data
 
-def longevity_analysis(data):
-    ax = sns.relplot(x = 'Pk', y ='Yrs', size = 'All.Star', hue = 'VORP',
-                     data = data, palette = 'seismic')
-    ax.set(title = 'Comparing Longevity of a Player with Draft Pick Number',
-           xlabel = 'Draft Pick Number', ylabel = 'Years Played' )
+def eucl_dist(x1,x2):
+    diff_x = x1 - x2
+    total = np.sum(diff_x **2)
+    eucl = np.sqrt(total)
+    return eucl
     
+
+class KNN:
     
-def get_points(data, column_name):
-    recent = data[data['Draft_Yr'] >= 2000]
-    grouped_data = recent.groupby(['Pk']).mean()
-    averaged_data = grouped_data[column_name]
-    return averaged_data
+    def __init__(self, K=1):
+        self.k = K
+        
+    def fit(self, X, y):
+        self.X_train = X
+        self.y_train = y
+        
+    def predict(self, X):
+        predicted_values = [self.find_class(x) for x in X]
+        return np.array(predicted_values)
+        
+        
+        
+    def find_class(self, x):
+        eucl_distances = [eucl_dist(x, x_train) for x_train in self.X_train]
+        
+        k_nearest_points = np.argsort(eucl_distances)[:self.k]
+        k_nearest_labels = [self.y_train[i] for i in k_nearest_points]
+        
+        most_common = Counter(k_nearest_labels).most_common(1)
+        
+        return most_common[0][0]
     
     
 def main():
-    data = clean_data('draft_data.csv')
-
-    recent = data[data['Draft_Yr'] >= 2000]
-    all_stars = clean_allstars('ALLSTARS.CSV')
     
+    # read and clean the data sets
+    recent = clean_data('draft_data.csv')
+    all_stars = clean_allstars('ALLSTARS.CSV')
+    combine_data = pd.read_csv('combine_stats.csv', index_col = 'Player')
+    combine_data = combine_data.drop(combine_data.columns[0:3], axis=1)
+    combine_data = combine_data.dropna()
+    
+    # add allstars as a column based of all_stars.csv
     recent['allstar'] = False
     for index, row in recent.iterrows():
-        if row[1] in all_stars:
+        if index in all_stars:
             recent.loc[index,'allstar'] = True
     
-    print(recent[recent['Player'].str.contains('Victor Oladipo')])
-    
-    # pick = pick_number_analysis(data)
+    #Visualize initial data
     # pick = pick_number_analysis(recent)
-    # college = college_attended_analysis(data)
-    # team = nba_team_analysis(data)
-    # print(data['allstar'])
-    get_points(data, 'PTS')
-    longevity_analysis(data)
+    # college = college_attended_analysis(recent)
+    # team = nba_team_analysis(recent)
+    # print(recent['allstar'])
+    #get_points(recent, 'PTS')
+    
+    # get test variables out
+    test_variables = recent[recent['Games'] <= 0]
+    recent = recent.drop(test_variables.index)
 
+    
+    # merge data sets together
+    full_data = recent.join(combine_data,how='inner')
+    print(full_data.loc['Rudy Gobert'])
+    
+    # get the Train labels and values
+    X_train = np.array(full_data.VORP)
+    y_train = np.array(full_data.iloc[:,-14:])
+    print(X_train.shape)
+    print(y_train.shape)
+    
+    # get the Test labels and values
+    x_test = np.array(test_variables.VORP)
+    y_test = np.array(test_variables.iloc[:,-14:])
+    print(x_test.shape)
+    print(y_test.shape)
+    
+    results = {}
+    k = 1
+
+    clf = KNN(K=k)
+    clf.fit(X_train, y_train)
+    predictions = clf.predict(x_test)
+
+        
+    # Print the precision and recall, among other metrics    
+    report = metrics.classification_report(y_test, predictions, digits = 3)   
+    f1 = metrics.f1_score(y_test, predictions)
+    print(report)
+    results[k] = f1
+
+
+        
+    plt.plot(results.keys(),results.values())
+
+    
+    
+    
+    
+    
 main()
     
