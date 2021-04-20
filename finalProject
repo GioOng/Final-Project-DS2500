@@ -23,8 +23,7 @@ def clean_data(filename):
     filtered = data[(data['Pk'] <= 30)]
     filtered = filtered.iloc[:, :-10]
     filtered = filtered.drop(filtered.columns[0], axis=1)
-
-   
+    
     return filtered
         
         
@@ -34,7 +33,6 @@ def clean_allstars(filename):
     with open(filename, errors='ignore') as file:
         # reading a csv file
         reader = csv.reader(file, delimiter=',')
-        
         for row in reader:
             if row[0] != 'PG':
                 allstars.append(row[0])
@@ -42,15 +40,12 @@ def clean_allstars(filename):
                 allstars.append(row[2])
                 allstars.append(row[3])
                 allstars.append(row[4])
-    
     while("" in allstars) :
         allstars.remove("")
         
-        
     return allstars
 
-    
-    
+
 def pick_number_analysis(data):
     grouped_data = data.groupby(['Pk']).sum()   
     x = grouped_data.index
@@ -78,7 +73,6 @@ def college_attended_analysis(data):
     plt.xticks(rotation = 90)
     plt.yticks(np.arange(min(y), max(y) + 1))
     plt.grid(axis = 'y')
-
     plt.show()
     
 def successful_organization_analysis(data):
@@ -110,7 +104,6 @@ def nba_team_analysis(data):
     plt.xticks(rotation = 90)
     plt.yticks(np.arange(min(y), max(y) + 1))
     plt.grid(axis = 'y')
-
     plt.show()
     
 def successful_organization_analysis(data):
@@ -138,18 +131,10 @@ class KNN:
         predicted_values = [self.find_class(x) for x in X]
         return np.array(predicted_values)
         
-        
-        
     def find_class(self, x):
         eucl_distances = [eucl_dist(x, x_train) for x_train in self.X_train]
-        
         k_nearest_points = np.argsort(eucl_distances)[:self.k]
-
-        
         k_nearest_labels = [self.y_train[i] for i in k_nearest_points]
-
-        
-        #most_common = Counter(k_nearest_labels).most_common(1)
         avg_score = np.array(k_nearest_labels).mean()
         
         return round(avg_score,1)
@@ -161,7 +146,6 @@ def main():
     # Draft Data Set
     data = clean_data('draft_data.csv')
     
-    
     # Combine Data Set
     combine_data = pd.read_csv('combine_stats.csv', index_col = 'Player')
     combine_data = combine_data.drop(combine_data.columns[0:3], axis=1)
@@ -169,7 +153,6 @@ def main():
     
     # Allstar Data Set
     all_stars = clean_allstars('ALLSTARS.CSV')
-    
     
     # add allstars as a column based of all_stars.csv
     data['allstar'] = False
@@ -199,8 +182,6 @@ def main():
     recent = data[data['Draft_Yr'] >= 2000]
     
     
-    
-    
     #%%% VISUALIZING THE INITIAL OBSERVATIONS
     pick_number_analysis(recent)
     college_attended_analysis(recent)
@@ -212,8 +193,6 @@ def main():
     sig_players = sig_teams[sig_teams['allstar'] == True]
     successful_organization_analysis(sig_players)
     high_school_analysis(data)
-    
-
     
     
     #%% MACHINE LEARNING PREDICTIONS (USING KNN)
@@ -236,8 +215,6 @@ def main():
     print(X_train.shape)
     print(y_train.shape)
     
-    
-    
     # predict the VORP of a player 
     k = 3
     clf = KNN(K=k)
@@ -249,13 +226,10 @@ def main():
     results['Actual'] = y_test
     results['predictions'] = predictions
     
-    
-    
     # evaluate and quantify the results
     print(metrics.max_error(y_test, predictions))
     print(metrics.mean_absolute_error(y_test, predictions))
     print(results)
-    
     
     # Visualize the results
     fig, ax = plt.subplots()
