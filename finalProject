@@ -194,6 +194,31 @@ def main():
     successful_organization_analysis(sig_players)
     high_school_analysis(data)
     
+    #%%% ANALYZING INDEPTH OBSERVATIONS    
+    hs = data[data['highschool'] == True]
+    hs_allstar = hs[hs['allstar'] == True]
+    rec_allstar = recent[recent['allstar'] == True]
+    kentucky = recent[recent['College'] == 'University of Kentucky']
+    uk_allstar = kentucky[kentucky['allstar'] == True] 
+    duke = recent[recent['College'] == 'Duke University']
+    duke_allstar = duke[duke['allstar'] == True] 
+    
+    print('\nThe % of Kentucky Players that were allstars:')
+    print(len(uk_allstar)/ len(kentucky) * 100)
+    print('\nDraft pick numbers for Kentucky allstars:')
+    print(uk_allstar['Pk'])
+    print('\nThe % of Duke Players that were allstars:')
+    print(len(duke_allstar)/ len(duke) * 100)
+    print('\nThe % of allstars that were picked in the lottery since 2000:')
+    print(len(rec_allstar[rec_allstar['Pk'] < 16]) / len(rec_allstar['Pk'])*100)
+    print('\nThe % of allstars that were not top 5 since 2000:')
+    print(len(rec_allstar[rec_allstar['Pk'] > 5]) / len(rec_allstar['Pk'])*100)
+    print('\nThe % of NBA players becomeme all starss out of highschool is:')
+    print(len(hs_allstar)/len(hs)*100)
+    print('\nThe % of all stars on the 9 selected teams since 2000:')
+    print(len(sig_players)/(len(recent[recent['allstar'] == True]))*100)
+    print('\nThe percent of first round picks the 9 selected teams had since 2000:')
+    print(len(sig_teams)/len(recent)*100)
     
     #%% MACHINE LEARNING PREDICTIONS (USING KNN)
     # merge data sets together
