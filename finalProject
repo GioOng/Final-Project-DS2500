@@ -23,16 +23,20 @@ def clean_data(filename):
     filtered = data[(data['Pk'] <= 30)]
     filtered = filtered.iloc[:, :-10]
     filtered = filtered.drop(filtered.columns[0], axis=1)
-    
+
+   
     return filtered
         
         
 def clean_allstars(filename):
-    
+    ''' Create a list of all stars from a csv file that containts the names
+    of every all star player up to 2020 '''
     allstars = []
     with open(filename, errors='ignore') as file:
         # reading a csv file
         reader = csv.reader(file, delimiter=',')
+        
+        # Add players to list
         for row in reader:
             if row[0] != 'PG':
                 allstars.append(row[0])
@@ -40,14 +44,29 @@ def clean_allstars(filename):
                 allstars.append(row[2])
                 allstars.append(row[3])
                 allstars.append(row[4])
+        #
     while("" in allstars) :
         allstars.remove("")
         
+        
     return allstars
 
-
+    
+    
 def pick_number_analysis(data):
-    grouped_data = data.groupby(['Pk']).sum()   
+    ''' Group data by pick number and sum each grouping. Visualize the grouped
+    data with the pick numbers on the x-axis and the number of allstars on the 
+    y-axis
+    
+    Objective: Determine if there are any trends in pick numbers on how 
+    successful a player is in the NBA to reveal that top 5 picks may be 
+    overvalued
+    '''
+    
+    # Group data by pick number + sum groups
+    grouped_data = data.groupby(['Pk']).sum()
+    
+    # Visualization
     x = grouped_data.index
     y = grouped_data['allstar']
     plt.bar(x, y)
@@ -60,7 +79,16 @@ def pick_number_analysis(data):
     plt.show()
     
 def college_attended_analysis(data):
-    data['College'] = data['College'].replace('0', 'Highschool')
+    ''' Group data by college attended and sum each grouping. Visualize the
+    grouped data with the college attended on the x-axis and the number of 
+    allstars on the y-axis
+    
+    Objective: Determine if there are any trends in college attended on 
+    how successful a player is in the NBA to reveal that some programs are 
+    able to develop more successful NBA prospects than others.
+    '''
+    # Change 
+    data['College'] = data['College'].replace('0', 'Did not attend')
 
     grouped_data = data.groupby(['College']).sum()
     significant = grouped_data[grouped_data['allstar'] > 1]
@@ -68,33 +96,61 @@ def college_attended_analysis(data):
     y = significant['allstar']
     plt.bar(x,y)
     plt.title('Number of Allstars Produced From Each University')
-    plt.xlabel('Name of College (if not attended, all highschools are grouped')
+    plt.xlabel('Name of College (if not attended, players are grouped')
     plt.ylabel('Number of Allstars')
     plt.xticks(rotation = 90)
     plt.yticks(np.arange(min(y), max(y) + 1))
     plt.grid(axis = 'y')
+
     plt.show()
     
 def successful_organization_analysis(data):
+    ''' Visualize filtered data (players who were on team that have drafted
+    3 or more allstars since 2000) with the pick number on the x-axis and the 
+    Value Over Replacement Player on the y-axis. Also the color of the data 
+    points are sorted by team that drafted each player.
+    
+    Objective: Identify any trends in pick number the teams that drafted 3 or 
+    more allstars to reveal team plays a large factor by showing the diverse
+    pick numbers. 
+    '''
     ax = sns.relplot(x = 'Pk', y = 'VORP', hue = 'Team', data = data)
     ax.set(title = 'Comparing Organizations That Produced 3 All-Stars or More',
            xlabel = 'Draft Pick Number', ylabel = 'Value Over Replacement Player' )
     
 def high_school_analysis(data):
+    '''Visualize master data with the pick number on the x-axis and the number of 
+    years played on the y-axis.  Also, the color of the data points are sorted
+    by players who came directly to the NBA from highschool or not.
+    
+    Objective: Identify how the success of high school prospects compares to the
+    remainder of the NBA to reveal the true potential of these prospecs'''
     ax = sns.relplot(x = 'Pk', y = 'Yrs', hue = 'highschool', size = 'All.Star', 
                 data = data, cmap = 'set1', sizes = (10,300))
     ax.set(title = 'Analyzing Players Drafted Out of High School',
            xlabel = 'Draft Pick Number', ylabel = 'Years Played')
     
 def longevity_analysis(data):
+    '''Visualize master data on the longevity of a player with the pick number
+    on the x-xis and years played on the y-axis. Also, the size and color of the 
+    data points are sorterd by VORP and number of all star awards, respectively.
+    
+    Objective: Analyze the value of players based on longevity to reveal that 
+    later round picks also produce very successful players'''
     ax = sns.relplot(x = 'Pk', y ='Yrs', size = 'VORP', hue = 'All.Star',
                      data = data, palette = 'RdYlGn', sizes = (10,300))
     ax.set(title = 'Comparing Longevity of a Player with Draft Pick Number',
            xlabel = 'Draft Pick Number', ylabel = 'Years Played' )    
     
 def nba_team_analysis(data):
+    '''Group data by team that drafted eac hpalyer and sum each grouping.
+    Visualize the grouped data with the team that drafts them on the x-axis
+    and the number of different allstars on the y-axis.
+    
+    Objective: Identify trends in the teams that draft each player to reveal
+    that organization does play a role in developing prospects'''
     grouped_data = data.groupby(['Team']).sum()
-    significant = grouped_data[grouped_data['allstar'] > 1]
+    significant = grouped_data[grouped_data['allstar'] >1]
     x = significant.index
     y = significant['allstar']
     plt.bar(x,y)
@@ -104,10 +160,13 @@ def nba_team_analysis(data):
     plt.xticks(rotation = 90)
     plt.yticks(np.arange(min(y), max(y) + 1))
     plt.grid(axis = 'y')
+
     plt.show()
     
 
+    
 def eucl_dist(x1,x2):
+    ''' Calculates the euclidean distance between two points'''
     diff_x = x1 - x2
     total = np.sum(diff_x **2)
     eucl = np.sqrt(total)
@@ -127,10 +186,18 @@ class KNN:
         predicted_values = [self.find_class(x) for x in X]
         return np.array(predicted_values)
         
+        
+        
     def find_class(self, x):
         eucl_distances = [eucl_dist(x, x_train) for x_train in self.X_train]
+        
         k_nearest_points = np.argsort(eucl_distances)[:self.k]
+
+        
         k_nearest_labels = [self.y_train[i] for i in k_nearest_points]
+
+        
+        #most_common = Counter(k_nearest_labels).most_common(1)
         avg_score = np.array(k_nearest_labels).mean()
         
         return round(avg_score,1)
