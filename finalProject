@@ -189,15 +189,13 @@ class KNN:
         
         
     def find_class(self, x):
+        ''' determine the predicted statistic according the euclidean distance between
+            the test variable and the training variables. Sorting for K neareast neighbor
+            and using indexing to indentify the most likely VORPs'''
+        
         eucl_distances = [eucl_dist(x, x_train) for x_train in self.X_train]
-        
         k_nearest_points = np.argsort(eucl_distances)[:self.k]
-
-        
         k_nearest_labels = [self.y_train[i] for i in k_nearest_points]
-
-        
-        #most_common = Counter(k_nearest_labels).most_common(1)
         avg_score = np.array(k_nearest_labels).mean()
         
         return round(avg_score,1)
