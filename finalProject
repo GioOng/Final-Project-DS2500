@@ -106,11 +106,7 @@ def nba_team_analysis(data):
     plt.grid(axis = 'y')
     plt.show()
     
-def successful_organization_analysis(data):
-    ax = sns.relplot(x = 'Pk', y = 'Yrs', hue = 'Team', data = data)
-    ax.set(title = 'Comparing Organizations That Produced 3 All-Stars or More',
-           xlabel = 'Draft Pick Number', ylabel = 'Years Played' )
-    
+
 def eucl_dist(x1,x2):
     diff_x = x1 - x2
     total = np.sum(diff_x **2)
