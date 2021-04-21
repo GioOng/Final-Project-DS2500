@@ -78,6 +78,18 @@ def pick_number_analysis(data):
     plt.grid(axis = 'y')
     plt.show()
     
+def longevity_analysis(data):
+    '''Visualize master data on the longevity of a player with the pick number
+    on the x-xis and years played on the y-axis. Also, the size and color of the 
+    data points are sorterd by VORP and number of all star awards, respectively.
+    
+    Objective: Analyze the value of players based on longevity to reveal that 
+    later round picks also produce very successful players'''
+    ax = sns.relplot(x = 'Pk', y ='Yrs', size = 'VORP', hue = 'All.Star',
+                     data = data, palette = 'RdYlGn', sizes = (10,300))
+    ax.set(title = 'Comparing Longevity of a Player with Draft Pick Number',
+           xlabel = 'Draft Pick Number', ylabel = 'Years Played' )    
+    
 def college_attended_analysis(data):
     ''' Group data by college attended and sum each grouping. Visualize the
     grouped data with the college attended on the x-axis and the number of 
@@ -89,7 +101,18 @@ def college_attended_analysis(data):
     '''
     # Change 
     data['College'] = data['College'].replace('0', 'Did not attend')
-
+    
+def high_school_analysis(data):
+    '''Visualize master data with the pick number on the x-axis and the number of 
+    years played on the y-axis.  Also, the color of the data points are sorted
+    by players who came directly to the NBA from highschool or not.
+    
+    Objective: Identify how the success of high school prospects compares to the
+    remainder of the NBA to reveal the true potential of these prospecs'''
+    ax = sns.relplot(x = 'Pk', y = 'Yrs', hue = 'highschool', size = 'All.Star', 
+                data = data, cmap = 'set1', sizes = (10,300))
+    ax.set(title = 'Analyzing Players Drafted Out of High School',
+           xlabel = 'Draft Pick Number', ylabel = 'Years Played')
     grouped_data = data.groupby(['College']).sum()
     significant = grouped_data[grouped_data['allstar'] > 1]
     x = significant.index
@@ -103,44 +126,6 @@ def college_attended_analysis(data):
     plt.grid(axis = 'y')
 
     plt.show()
-    
-def successful_organization_analysis(data):
-    ''' Visualize filtered data (players who were on team that have drafted
-    3 or more allstars since 2000) with the pick number on the x-axis and the 
-    Value Over Replacement Player on the y-axis. Also the color of the data 
-    points are sorted by team that drafted each player.
-    
-    Objective: Identify any trends in pick number the teams that drafted 3 or 
-    more allstars to reveal team plays a large factor by showing the diverse
-    pick numbers. 
-    '''
-    ax = sns.relplot(x = 'Pk', y = 'VORP', hue = 'Team', data = data)
-    ax.set(title = 'Comparing Organizations That Produced 3 All-Stars or More',
-           xlabel = 'Draft Pick Number', ylabel = 'Value Over Replacement Player' )
-    
-def high_school_analysis(data):
-    '''Visualize master data with the pick number on the x-axis and the number of 
-    years played on the y-axis.  Also, the color of the data points are sorted
-    by players who came directly to the NBA from highschool or not.
-    
-    Objective: Identify how the success of high school prospects compares to the
-    remainder of the NBA to reveal the true potential of these prospecs'''
-    ax = sns.relplot(x = 'Pk', y = 'Yrs', hue = 'highschool', size = 'All.Star', 
-                data = data, cmap = 'set1', sizes = (10,300))
-    ax.set(title = 'Analyzing Players Drafted Out of High School',
-           xlabel = 'Draft Pick Number', ylabel = 'Years Played')
-    
-def longevity_analysis(data):
-    '''Visualize master data on the longevity of a player with the pick number
-    on the x-xis and years played on the y-axis. Also, the size and color of the 
-    data points are sorterd by VORP and number of all star awards, respectively.
-    
-    Objective: Analyze the value of players based on longevity to reveal that 
-    later round picks also produce very successful players'''
-    ax = sns.relplot(x = 'Pk', y ='Yrs', size = 'VORP', hue = 'All.Star',
-                     data = data, palette = 'RdYlGn', sizes = (10,300))
-    ax.set(title = 'Comparing Longevity of a Player with Draft Pick Number',
-           xlabel = 'Draft Pick Number', ylabel = 'Years Played' )    
     
 def nba_team_analysis(data):
     '''Group data by team that drafted eac hpalyer and sum each grouping.
@@ -162,6 +147,25 @@ def nba_team_analysis(data):
     plt.grid(axis = 'y')
 
     plt.show()
+    
+def successful_organization_analysis(data):
+    ''' Visualize filtered data (players who were on team that have drafted
+    3 or more allstars since 2000) with the pick number on the x-axis and the 
+    Value Over Replacement Player on the y-axis. Also the color of the data 
+    points are sorted by team that drafted each player.
+    
+    Objective: Identify any trends in pick number the teams that drafted 3 or 
+    more allstars to reveal team plays a large factor by showing the diverse
+    pick numbers. 
+    '''
+    ax = sns.relplot(x = 'Pk', y = 'VORP', hue = 'Team', data = data)
+    ax.set(title = 'Comparing Organizations That Produced 3 All-Stars or More',
+           xlabel = 'Draft Pick Number', ylabel = 'Value Over Replacement Player' )
+    
+
+    
+
+
     
 
     
