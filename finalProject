@@ -213,7 +213,7 @@ def main():
     print(len(rec_allstar[rec_allstar['Pk'] < 16]) / len(rec_allstar['Pk'])*100)
     print('\nThe % of allstars that were not top 5 since 2000:')
     print(len(rec_allstar[rec_allstar['Pk'] > 5]) / len(rec_allstar['Pk'])*100)
-    print('\nThe % of NBA players becomeme all starss out of highschool is:')
+    print('\nThe % of NBA players that became all stars out of highschool is:')
     print(len(hs_allstar)/len(hs)*100)
     print('\nThe % of all stars on the 9 selected teams since 2000:')
     print(len(sig_players)/(len(recent[recent['allstar'] == True]))*100)
